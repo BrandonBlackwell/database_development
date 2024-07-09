@@ -51,7 +51,6 @@ class DataMigrator:
             # we should wait for approval that it has indeed been inserted and then 
             # insert the doc id into our doc tracker.
             # self.doc_tracker.append(doc["_id"])
-            pass
 doc = collection.find_one()
 updated_doc = {}
 for field, val in doc.items():

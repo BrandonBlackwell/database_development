@@ -20,38 +20,9 @@ curs = connection.cursor()
 # curs.execute(sql)
 # print(curs.fetchall())
 
-# Data Migration Service
+# Pcm Data Migration Service
 class DataMigrator:
-    data_map = {
-        "Hospital"    : "hospital_name",
-        "Doctor"      : "doctor_name",
-        "Room Number" : "room_number"
-    }
-    doc_tracker = []
-    
-    def __init__(self, mongo_doc=None, mongo_batch=None):
-        self.mongo_doc   = mongo_doc
-        self.mongo_batch = mongo_batch
-        
-    def update_doc(self, orig_doc):
-        updated_doc = {}
-        for field, val in orig_doc.items():
-            if field in self.data_map.keys():
-                updated_doc.update({self.data_map[field]:val})
-            else:
-                updated_doc.update({field:val})
-        return updated_doc
-    
-    def migrate(self,doc):
-        if doc["_id"] in self.doc_tracker:
-            raise Exception("Document has already been inserted into Maria")
-        else:
-            # If we insert the document id into the doc tracker before getting approval from Maria
-            # it is possible that it did not make there so, after sending to MariaDB 
-            # we should wait for approval that it has indeed been inserted and then 
-            # insert the doc id into our doc tracker.
-            # self.doc_tracker.append(doc["_id"])
-            pass
+    def DataMigrator(self)
 doc = collection.find_one()
 updated_doc = {}
 for field, val in doc.items():
