@@ -1,0 +1,36 @@
+exit
+db.healthcare.countDocuments()
+db.healthcare.count_documents()
+db.healthcare.findOne({})
+db.findOne({})
+show collections
+use dev_dummy;
+USE dev_dummy;
+USE dev_dummy
+show dbs
+help
+SHOW databases;
+SHOW dbs;
+SHOW db;
+SHOW --help;
+USE DATABASE dev_dummy;
+USE dev_dummy;
+SHOW DBS;
+exit
+db.healthcare.countDocuments()
+db.healthcare.findOne({"Blood Type":{$ne:"M"}})
+db.healthcare.findOne()
+db.find_one({})
+db.find_one()
+use dev_dummy;
+exit
+db.createCollection("healthcare")
+use dev_dummy;
+show dbs
+SHOW --HELP
+SHOW
+clear
+SHOW Database;
+SHOW Databases;
+SHOW dbs;
+SHOW dbs
