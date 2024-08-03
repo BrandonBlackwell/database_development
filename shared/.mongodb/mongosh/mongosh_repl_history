@@ -1,4 +1,13 @@
 exit
+/Users/brandonblackwell/Desktop/Software-Engineering/database_development/dev_env/bin/python /Users/brandonblackwell/Desktop/Software-Engineering/database_development/main.py
+help
+Use collection healthcare;
+use dev_dummy;
+use healthcare;
+use dev_dummy;
+show collections;
+use dev_dummy;
+exit
 db.healthcare.countDocuments()
 db.healthcare.count_documents()
 db.healthcare.findOne({})

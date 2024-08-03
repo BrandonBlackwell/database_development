@@ -1,4 +1,5 @@
 import pymysql
+import hashlib
 
 # Source
 # Doc
@@ -16,15 +17,13 @@ import pymysql
 
 # Data Migration Service
 class DataMigrator:
-    
-    doc_tracker = []
-    
-    def __init__(self, mongo_doc, data_map, host="localhost", user="root", database="dev_dummy"):
+    def __init__(self, mongo_doc=None, data_map=None, host="localhost", user="root", database="dev_dummy"):
         self.mongo_doc  = mongo_doc
         self.data_map   = data_map
-        self.connection = pymysql.connect(host, user, database)
+        self.connection = pymysql.connect(host=host, user=user, database=database)
         self.curs       = self.__get_curs()
     
+    metrics_tuple = []
     def __get_curs(self):
         return self.connection.cursor()
     
@@ -42,36 +41,23 @@ class DataMigrator:
                 updated_doc.update({field:val})
         return updated_doc
     
-    def migrate(self,doc):
-        if doc["_id"] in self.doc_tracker:
-            raise Exception("Document has already been inserted into Maria")
-        else:
-            # If we insert the document id into the doc tracker before getting approval from Maria
-            # it is possible that it did not make there so, after sending to MariaDB 
-            # we should wait for approval that it has indeed been inserted and then 
-            # insert the doc id into our doc tracker.
-            # self.doc_tracker.append(doc["_id"])
-            
-            # Loading fact table
-            # Solution 1: Create a list to keep track of the tables that 
-            # are populated. Iterate through list of tables and query for their
-            # (natural key + value) which is doc["_id"]+icUnit
-            # Maybe use a hash for this or composite key.
-            
-            # Inserting new rows based on 1 or many metric units:
-            # Solution 1: Create a counter var or create a list of tuples 
-            # [k:v] Create new rows based off counter or len of list. 
-            
+    def clean(self, json_obj):
+        updated_json = {"metrics":[], "units":[], "values":[]}
+        for k,v in json_obj.items():
+            if k[-4:] == "Unit":
+                updated_json["metrics"] += [self.metrics_map[k]]
+                updated_json["units"] += [v]
+            elif k[-5:] == "Value":
+                updated_json["values"] += [v]
+        for i in range(len(updated_json["metrics"])):
+            self.metrics_tuple = (updated_json["metrics"][i],updated_json["units"][i],updated_json["values"][i])
+        return updated_json
+    
+    def migrate(self,json_obj):
+        pass
             # For late arriving dimensions
-            # Solution 1: Since every obj has a type we will load a dummy value 
-            # in columns where data could possibly be. When the real data is
-            # loaded it will have the same doc["_id"] + type. Querying this will
-            # get you fact_id to the correct fact row. Use the fact row to update
-            # dimension rows that have the dummy values. How do we know dummy
-            # values were used in dimensions? 
-                # Solution 1: Use a standardized default dummy value. Now we'd
-                # be able to compare the values to the set of dummy values.
-            pass
+            # Solution 1: Use a standardized default dummy value. Now we'd
+            # be able to compare the values to the set of dummy values.
 # doc = collection.find_one()
 # doc = {}
 # updated_doc = {}
