@@ -9,9 +9,8 @@ from data_migrator import DataMigrator
 # print(", ".join(["%s"]*3))
 cursor_obj = []
 for i in range(5):
-    cursor_obj.append((i, f"col_{i}", f"col_{i}"))
-id = [i[0] for i in [x for x in cursor_obj]]
-print(id)
+    cursor_obj.append((i, f"col_{i}", "col_{i}"))
+print(cursor_obj)
 # print(collection.find_one({}))
 
 # json = list(collection.find({}))

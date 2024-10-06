@@ -40,14 +40,11 @@ class DataMigrator:
         tables = self.curs.fetchall()
         return tables or None
     
-    def get_columns(self, json_obj, table):
+    def get_columns(self, table):
         query = f"SHOW COLUMNS FROM {table};"
         self.curs.execute(query)
-        result = self.curs.fetchall()
-        columns = [i[0] for i in [tup for tup in result]] or None
-        columns_in_json = [self.data_map[k] for k in list(json_obj.keys()) if self.data_map[k] in columns]
-        return columns_in_json
-                
+        columns = self.curs.fetchall()
+        return [i[0] for i in [tup for tup in columns]] or None
     
     def get_values(self, json_obj, fields):
         values = []
@@ -89,21 +86,12 @@ class DataMigrator:
         self.connection.commit()
         return affected_rows
     
-    def migrate(self, json_arr):
+    def migrate(self, json_obj):
+        updated_json = self.clean(json_obj)
         tables       = self.get_tables()
-        data  = {}
-        
+        data = []   
         for table in tables:
-            data.update({table: []})
-        
-        for table in tables:  
-            for json_obj in json_arr:
-                updated_json = self.clean(json_obj)
-            
-                columns = self.get_columns(json_obj, table)
-                values  = self.get_values(json_obj, columns)
-                
-                data[table] += [values]
-                
-                self.insert_into_dim(table, columns, values)
+            columns = self.get_columns(table)
+            values  = self.get_values(json_obj, columns)
+            insert_into_dim()
             

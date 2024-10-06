@@ -34,27 +34,17 @@ class DataMigrator:
     def __get_curs(self):
         return self.connection.cursor()
     
-    def get_tables(self):
+    def get_tables(self, database = "dev_dummy"):
         query = "SHOW TABLES;"
         self.curs.execute(query)
         tables = self.curs.fetchall()
         return tables or None
     
-    def get_columns(self, json_obj, table):
+    def get_columns(self, table):
         query = f"SHOW COLUMNS FROM {table};"
         self.curs.execute(query)
-        result = self.curs.fetchall()
-        columns = [i[0] for i in [tup for tup in result]] or None
-        columns_in_json = [self.data_map[k] for k in list(json_obj.keys()) if self.data_map[k] in columns]
-        return columns_in_json
-                
-    
-    def get_values(self, json_obj, fields):
-        values = []
-        for k, v in json_obj.items():
-            if self.data_map[k] in fields:
-                values.append(v)
-        return values
+        columns = self.curs.fetchall()
+        return [i[0] for i in [tup for tup in columns]] or None
     
     def clean(self, json_obj):
         updated_json = {"metrics":[], "units":[], "values":[]}
@@ -68,10 +58,10 @@ class DataMigrator:
             self.metrics_tuple = (updated_json["metrics"][i],updated_json["units"][i],updated_json["values"][i])
         return updated_json
     
-    def insert_into_dim(self, table: str, fields: list, data: list):
+    def insert_into_dim(self, table, fields, values):
         placeholder = ", ".join(["%s"]*len(fields))
         query = f"INSERT INTO {table} ({fields}) VALUES ({placeholder});"
-        affected_rows = self.curs.executemany(query, data)
+        affected_rows = self.curs.executemany(query, values)
         self.connection.commit()
         return affected_rows
     
@@ -89,21 +79,6 @@ class DataMigrator:
         self.connection.commit()
         return affected_rows
     
-    def migrate(self, json_arr):
-        tables       = self.get_tables()
-        data  = {}
-        
-        for table in tables:
-            data.update({table: []})
-        
-        for table in tables:  
-            for json_obj in json_arr:
-                updated_json = self.clean(json_obj)
-            
-                columns = self.get_columns(json_obj, table)
-                values  = self.get_values(json_obj, columns)
-                
-                data[table] += [values]
-                
-                self.insert_into_dim(table, columns, values)
-            
+    def migrate(self, json_obj):
+        tables = self.get_tables()
+

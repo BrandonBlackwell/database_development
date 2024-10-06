@@ -89,21 +89,13 @@ class DataMigrator:
         self.connection.commit()
         return affected_rows
     
-    def migrate(self, json_arr):
+    def migrate(self, json_obj):
+        updated_json = self.clean(json_obj)
         tables       = self.get_tables()
-        data  = {}
-        
+        data = []   
         for table in tables:
-            data.update({table: []})
-        
-        for table in tables:  
-            for json_obj in json_arr:
-                updated_json = self.clean(json_obj)
-            
-                columns = self.get_columns(json_obj, table)
-                values  = self.get_values(json_obj, columns)
-                
-                data[table] += [values]
-                
-                self.insert_into_dim(table, columns, values)
+            columns = self.get_columns(json_obj, table)
+            values  = self.get_values(json_obj, columns)
+            data.append((values))
+        self.insert_into_dim(table, columns, data)
             

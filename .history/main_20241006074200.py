@@ -10,7 +10,7 @@ from data_migrator import DataMigrator
 cursor_obj = []
 for i in range(5):
     cursor_obj.append((i, f"col_{i}", f"col_{i}"))
-id = [i[0] for i in [x for x in cursor_obj]]
+id = [i for i in cursor_obj]
 print(id)
 # print(collection.find_one({}))
 
