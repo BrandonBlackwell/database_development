@@ -6,7 +6,7 @@ from data_migrator import DataMigrator
 # mongo_db = client.dev_dummy
 # collection = mongo_db.healthcare
 
-
+# print(", ".join(["%s"]*3))
 
 # print(collection.find_one({}))
 

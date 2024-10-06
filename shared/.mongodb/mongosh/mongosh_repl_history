@@ -1,4 +1,11 @@
 exit
+db.healthcare.find()
+db.healthcare.findOne()
+help
+show collections
+use dev_dummy
+show dbs;
+exit
 /Users/brandonblackwell/Desktop/Software-Engineering/database_development/dev_env/bin/python /Users/brandonblackwell/Desktop/Software-Engineering/database_development/main.py
 help
 Use collection healthcare;
