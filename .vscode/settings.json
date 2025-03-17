@@ -2,5 +2,14 @@
     "cSpell.words": [
         "pymongo",
         "pymysql"
-    ]
+    ],
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./data_cleansing",
+        "-p",
+        "test*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true
 }
