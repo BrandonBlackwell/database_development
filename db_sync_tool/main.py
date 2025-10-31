@@ -1,4 +1,4 @@
-from cli.parser import run_cli
+from db_sync_tool.cli.parser import run_cli
 
 if __name__ == "__main__":
     run_cli()
