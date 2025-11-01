@@ -5,3 +5,17 @@ dev_env
 __pycache__
 archive.zip
 shared
+*.pyc
+.env
+*.log
+.idea
+*.sqlite3
+db_sync_tool/tests/data/*.sqlite3
+db_sync_tool/tests/data/*.log
+db_sync_tool/tests/data/*.pyc
+db_sync_tool/tests/data/__pycache__
+db_sync_tool/tests/data/.DS_store
+db_sync_tool/tests/data/archive.zip
+db_sync_tool/tests/data/dev_env
+db_sync_tool/tests/data/.vscode
+*.sql
