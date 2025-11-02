@@ -10,7 +10,7 @@ for filename in os.listdir(sql_dir):
         disable_fk_checks = "SET FOREIGN_KEY_CHECKS=0;\n"
 
         with open(tmp_path, 'w') as tmp_file:
-            tmp_data = tmp_file.write(disable_fk_checks)
+            tmp_file.write(disable_fk_checks)
             with open(sql_path, 'r') as sql_file:
                 for line in sql_file:
                     tmp_file.write(line)
