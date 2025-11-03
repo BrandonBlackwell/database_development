@@ -1,13 +1,25 @@
 from sync.design.data_syncs import process_design_sync
 from sync.result.data_syncs import process_result_sync
 class SyncManager:
-    def __init__(self, target_db, sync_mode, tables=None, directory=None, start_point=None, masks=None):
+    def __init__(
+        self, 
+        target_db, 
+        sync_mode, 
+        tables=None, 
+        directory=None, 
+        start_point=None, 
+        masks=None, 
+        chips=None, 
+        m_ids=None
+    ):
         self.target_db = target_db
         self.sync_mode = sync_mode
         self.tables = tables
         self.directory = directory
         self.start_point = start_point
         self.masks = masks
+        self.chips = chips
+        self.m_ids = m_ids
 
     # Use the Strategy design pattern to select the sync strategy based on sync_mode
     async def execute_sync(self):
@@ -39,13 +51,22 @@ class SyncManager:
         # Example pseudocode:
         # source_db = connect_to_database(source_config)
         # target_db = connect_to_database(target_config)
-        # design_data = fetch_design_data(source_db)
-        # transformed_data = transform_design_data(design_data)
-        # update_design_data(target_db, transformed_data)
+        # design_data_source = fetch_design_data(source_db)
+        # update_design_data_target(target_db, transformed_data)
         # Warn if no table masks are provided for design sync
         if not self.masks:
             print("No table masks specified; all design tables will be synchronized.")
-        process_design_sync(self.target_db, self.tables, self.directory, self.start_point, self.masks)
+        process_design_sync(self.target_db, self.tables, self.directory, self.masks, self.chips, self.m_ids)
+        
+        def process_design_sync(target_db, tables, directory, masks, chips, m_ids):
+            # Placeholder function to process design synchronization
+            # Sync device tables
+            sync_device_tables(target_db, tables, directory, chips, m_ids)
+            # Sync design tables
+            sync_design_tables(target_db, tables, directory, masks)
+            # Sync design fact
+            sync_design_fact(target_db, tables, directory, masks, chips, m_ids)
+            print(f"Processing design sync for target_db: {target_db}, tables: {tables}, directory: {directory}, masks: {masks}, chips: {chips}, m_ids: {m_ids}")
     
     async def sync_result(self):
         # User must specify start point for result sync
@@ -69,9 +90,14 @@ class SyncManager:
                     fk_batches[dim_table] = set().add(fk)
                 else:
                     fk_batches[dim_table].add(fk)
+                    
+        # Sync device tables
+        sync_device_tables(source_db, target_db, fk_batches["device"])
+        
         # Grab design fact data in bulk
-        design_fact_data = fetch_design_fact_data_bulk(source_db, fk_batches["design"], fk_batches["device"])
-        insert_design_fact_data_bulk(target_db, design_fact_data)
+        design_fact_data = fetch_design_fact_data_source(source_db, fk_batches["design"], fk_batches["device"])
+        insert_design_fact_data_target(target_db, design_fact_data)
+        
         
         # Gathers raw data for all required dimension tables in bulk
         dim_data = {}
@@ -85,4 +111,16 @@ class SyncManager:
         insert_fact_data(target_db, fact_record, prod_data)
 
 
-            
+    async def sync_result_sql(self):
+        # Uses sql dump files to sync result data
+        # This function would handle the synchronization of result data
+        # using SQL dump files to transfer data between databases.
+        # For example:
+        # 1. Generate SQL dump files from the source database.
+        # 2. Transfer the SQL dump files to the target database environment.
+        # 3. Execute the SQL dump files to insert or update data in the target database.
+        # Example pseudocode:
+        # generate_sql_dump(source_db, dump_file_path)
+        # transfer_dump_to_target(dump_file_path, target_env)
+        # execute_sql_dump(target_db, dump_file_path)
+        pass
