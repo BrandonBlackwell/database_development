@@ -43,16 +43,46 @@ class SyncManager:
         # transformed_data = transform_design_data(design_data)
         # update_design_data(target_db, transformed_data)
         # Warn if no table masks are provided for design sync
-        if self.sync_mode == 'design' and not self.masks:
+        if not self.masks:
             print("No table masks specified; all design tables will be synchronized.")
         process_design_sync(self.target_db, self.tables, self.directory, self.start_point, self.masks)
     
     async def sync_result(self):
-        # Placeholder for result synchronization logic
-        # This function would handle the synchronization of result data
-        # between different database systems or environments.
-        # Similar steps as in sync_design would be followed here.
         # User must specify start point for result sync
         if self.sync_mode == 'result' and 'fact' in self.tables and not self.start_point:
             raise ValueError("Start point must be specified when synchronizing 'fact' tables.")
         process_result_sync(self.target_db, self.tables, self.directory, self.start_point)
+        
+        #  This approach reduces the number of database calls and improves performance.
+        # Example pseudocode for solution 2:
+        source_db = connect_to_database(source_config)
+        target_db = connect_to_database(target_config)
+        prod_data = fetch_prod_data(source_db, start_point)
+        
+        # Batch processing of foreign keys
+        fk_batches = {}
+        for fact_record in prod_data:
+            dim_keys = extract_dimension_keys(fact_record)  # e.g., {'dim_table1': fk1, 'dim_table2': fk2}
+            
+            for dim_table, fk in dim_keys.items():
+                if dim_table not in fk_batches:
+                    fk_batches[dim_table] = set().add(fk)
+                else:
+                    fk_batches[dim_table].add(fk)
+        # Grab design fact data in bulk
+        design_fact_data = fetch_design_fact_data_bulk(source_db, fk_batches["design"], fk_batches["device"])
+        insert_design_fact_data_bulk(target_db, design_fact_data)
+        
+        # Gathers raw data for all required dimension tables in bulk
+        dim_data = {}
+        for dim_table, fks in fk_batches.items():
+            # fetches all required dimension data in bulk
+            dim_data[dim_table] = get_dim_data_bulk(dim_table, fks)
+        # Inserts all dimension data into target db in bulk
+        for dim_table, dim_data in dim_data.items():
+            insert_dim_data_bulk(target_db, dim_table, dim_data[dim_table])
+        # Finally, insert fact data referencing the pre-fetched dimension data
+        insert_fact_data(target_db, fact_record, prod_data)
+
+
+            
