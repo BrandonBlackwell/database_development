@@ -1,6 +1,7 @@
 import argparse
 from db_sync_tool.sync.utils.logging import setup_logging
 from db_sync_tool.sync.sync_manager import SyncManager
+
 async def run_cli():
     setup_logging()
     print("Hello from the CLI parser!")
@@ -15,11 +16,14 @@ async def run_cli():
     argparse.add_argument('--chips', type=str, nargs='*', help='List of chip identifiers to filter data')
     argparse.add_argument('--m_ids', type=str, nargs='*', help='List of measurement IDs to filter data')
 
-    
     args = argparse.parse_args()
 
     sync_manager = SyncManager(
         sync_mode=args.sync_mode,
+        source_engine=None,
+        target_engine=None,
+        db_settings=None,
+        db_type=args.db_type,
         target_db=args.target_db_url,
         tables=args.tables,
         directory=args.directory,
